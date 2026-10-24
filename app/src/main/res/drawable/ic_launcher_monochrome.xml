@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- The Catch Basin Arc -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M36,76 C44,83 64,83 72,76" />
+
+    <!-- Droplet with True Cutout for Android 13+ Themed Icons (evenOdd fill) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="
+            M54,25
+            C45,34 35,47 35,57
+            C35,66 43,71 54,71
+            C65,71 73,66 73,57
+            C73,47 63,34 54,25
+            Z
+            M54,42
+            A2,2 0 1,1 53.99,42
+            Z
+            M54,45
+            C50,45 47,48 47,54
+            L45,59
+            L63,59
+            L61,54
+            C61,48 58,45 54,45
+            Z
+            M54,59.5
+            A1.8,1.8 0 1,1 53.99,59.5
+            Z" />
+</vector>

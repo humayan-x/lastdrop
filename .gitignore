@@ -1,0 +1,38 @@
+# Android Studio & IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+.kotlin/
+
+# Gradle & Build Artifacts
+.gradle/
+build/
+*/build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local Environment & Secrets
+local.properties
+keystore.properties
+release.jks
+*.jks
+*.keystore
+*.p12
+*.pem
+google-services.json
+GoogleService-Info.plist
+*.env
+*.env.*
+*.secret
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Internal & Planning Docs
+v2.md

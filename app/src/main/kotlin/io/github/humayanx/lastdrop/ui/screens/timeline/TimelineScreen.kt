@@ -1,0 +1,181 @@
+package io.github.humayanx.lastdrop.ui.screens.timeline
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.humayanx.lastdrop.data.local.entity.NotificationRecord
+import io.github.humayanx.lastdrop.service.PermissionManager
+import io.github.humayanx.lastdrop.ui.components.AppFilterChips
+import io.github.humayanx.lastdrop.ui.components.DeleteConfirmDialog
+import io.github.humayanx.lastdrop.ui.components.LastDropHeader
+import io.github.humayanx.lastdrop.ui.components.LoadingContent
+import io.github.humayanx.lastdrop.ui.components.NotificationCard
+import io.github.humayanx.lastdrop.ui.components.NotificationDetailSheet
+import io.github.humayanx.lastdrop.ui.components.PermissionPromptDialog
+import io.github.humayanx.lastdrop.ui.components.SearchInputBar
+import io.github.humayanx.lastdrop.ui.theme.AppIcons
+import io.github.humayanx.lastdrop.ui.theme.MonoBody
+
+@Composable
+fun TimelineScreen(
+    viewModel: TimelineViewModel = viewModel(),
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var recordPendingDelete by remember { mutableStateOf<NotificationRecord?>(null) }
+
+    // Real-time resume listener: updates immediately when returning from system settings
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.checkPermission(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            viewModel.checkPermission(context)
+        }
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    if (uiState.isLoading) {
+        Column(modifier.fillMaxSize()) {
+            LastDropHeader(title = "History")
+            LoadingContent(Modifier.weight(1f))
+        }
+        return
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // Unified Header (No subtext, exact 56.dp baseline)
+        LastDropHeader(
+            title = "History",
+            actions = {
+                IconButton(
+                    onClick = viewModel::onToggleSearch,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = if (uiState.isSearchActive) AppIcons.SearchOff else Icons.Rounded.Search,
+                        contentDescription = "Search",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        )
+
+        // Search Bar (if toggled)
+        if (uiState.isSearchActive) {
+            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                SearchInputBar(
+                    query = uiState.searchQuery,
+                    onQueryChange = viewModel::onSearchQueryChanged
+                )
+            }
+        }
+
+        // App Filters Row with breathing room
+        if (uiState.appFilters.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(6.dp))
+            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                AppFilterChips(
+                    filters = uiState.appFilters,
+                    totalCount = uiState.totalCount,
+                    selectedApp = uiState.selectedApp,
+                    onAppSelected = viewModel::onAppSelected
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+
+        // Notification Stream
+        if (uiState.notifications.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "LEDGER EMPTY",
+                    style = MonoBody,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 112.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(
+                    items = uiState.notifications,
+                    key = { it.id }
+                ) { record ->
+                    NotificationCard(
+                        record = record,
+                        onClick = { viewModel.onSelectRecord(record) },
+                        onToggleStar = { viewModel.onToggleStar(record) },
+                        onDelete = { recordPendingDelete = record }
+                    )
+                }
+            }
+        }
+    }
+
+    // Detail Bottom Sheet
+    NotificationDetailSheet(
+        record = uiState.selectedRecordForDetail,
+        onDismiss = { viewModel.onSelectRecord(null) },
+        onToggleStar = viewModel::onToggleStar,
+        onDelete = { recordPendingDelete = it }
+    )
+
+    // Confirmation alert box before deletion
+    DeleteConfirmDialog(
+        record = recordPendingDelete,
+        onConfirm = {
+            recordPendingDelete?.let { viewModel.onDeleteRecord(it) }
+            recordPendingDelete = null
+        },
+        onDismiss = { recordPendingDelete = null }
+    )
+}
