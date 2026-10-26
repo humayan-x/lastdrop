@@ -7,8 +7,8 @@ data class SettingsUiState(
     val isNotificationListenerGranted: Boolean = false,
     val isServiceConnected: Boolean = false,
     val isBatteryOptimizedIgnored: Boolean = false,
-    val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val retentionPeriod: RetentionPeriod = RetentionPeriod.DAYS_30,
+    val themeMode: ThemeMode = ThemeMode.LIGHT,
+    val retentionPeriod: RetentionPeriod = RetentionPeriod.DAYS_7,
     val setupCompleted: Boolean = false,
     val showClearAllDialog: Boolean = false
 )

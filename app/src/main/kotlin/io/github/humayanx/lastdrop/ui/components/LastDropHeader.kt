@@ -19,6 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+
 /**
  * Unified top header layout shared across all screens.
  * Fixed 56.dp height ensures identical text alignment across every page.
@@ -27,6 +30,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun LastDropHeader(
     title: String,
+    navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     Column(
@@ -39,18 +43,29 @@ fun LastDropHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
-                .padding(horizontal = 20.dp),
+                .padding(
+                    start = if (navigationIcon != null) 8.dp else 20.dp,
+                    end = 20.dp
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = title.uppercase(),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.8.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f, fill = false)
-            )
+            ) {
+                if (navigationIcon != null) {
+                    navigationIcon()
+                    Spacer(modifier = Modifier.width(6.dp))
+                }
+                Text(
+                    text = title.uppercase(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.8.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,

@@ -16,17 +16,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import android.widget.Toast
+import io.github.humayanx.lastdrop.BuildConfig
+import io.github.humayanx.lastdrop.LastDropApp
+import io.github.humayanx.lastdrop.data.debug.DebugDataSeeder
+import kotlinx.coroutines.launch
 import io.github.humayanx.lastdrop.ui.components.LastDropHeader
 import io.github.humayanx.lastdrop.ui.screens.settings.components.OssLicensesSheet
 import io.github.humayanx.lastdrop.ui.screens.settings.components.PurgeConfirmDialog
@@ -113,6 +121,25 @@ fun SettingsScreen(
                         ) {
                             Text(text = "CLEAR ALL RECORDS", style = MonoBody)
                         }
+                    }
+                }
+            }
+
+            if (BuildConfig.DEBUG) {
+                item {
+                    val scope = rememberCoroutineScope()
+                    val context = LocalContext.current
+                    OutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        onClick = {
+                            scope.launch {
+                                DebugDataSeeder.seed(LastDropApp.instance.database.notificationDao())
+                                Toast.makeText(context, "Dummy test data added", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) {
+                        Text("RE-SEED TEST DATA (DEBUG)", style = MonoBody)
                     }
                 }
             }

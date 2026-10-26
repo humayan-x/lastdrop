@@ -90,6 +90,10 @@ class SettingsViewModel(
         return true
     }
 
+    suspend fun skipSetup() {
+        preferencesRepository.completeSetup()
+    }
+
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch {
             preferencesRepository.setThemeMode(mode)

@@ -24,6 +24,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,7 @@ import io.github.humayanx.lastdrop.ui.components.NotificationCard
 import io.github.humayanx.lastdrop.ui.components.NotificationDetailSheet
 import io.github.humayanx.lastdrop.ui.components.PermissionPromptDialog
 import io.github.humayanx.lastdrop.ui.components.SearchInputBar
+import io.github.humayanx.lastdrop.ui.screens.archive.ArchiveScreen
 import io.github.humayanx.lastdrop.ui.theme.AppIcons
 import io.github.humayanx.lastdrop.ui.theme.MonoBody
 
@@ -56,6 +58,15 @@ fun TimelineScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var recordPendingDelete by remember { mutableStateOf<NotificationRecord?>(null) }
+    var showArchive by rememberSaveable { mutableStateOf(false) }
+
+    if (showArchive) {
+        ArchiveScreen(
+            onBack = { showArchive = false },
+            modifier = modifier
+        )
+        return
+    }
 
     // Real-time resume listener: updates immediately when returning from system settings
     DisposableEffect(lifecycleOwner) {
@@ -86,17 +97,17 @@ fun TimelineScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Unified Header (No subtext, exact 56.dp baseline)
+        // Unified Header with Timer icon pointing to Archive
         LastDropHeader(
             title = "History",
             actions = {
                 IconButton(
-                    onClick = viewModel::onToggleSearch,
+                    onClick = { showArchive = true },
                     modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
-                        imageVector = if (uiState.isSearchActive) AppIcons.SearchOff else Icons.Rounded.Search,
-                        contentDescription = "Search",
+                        imageVector = AppIcons.Timer,
+                        contentDescription = "Archived Drops",
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(20.dp)
                     )
@@ -104,19 +115,18 @@ fun TimelineScreen(
             }
         )
 
-        // Search Bar (if toggled)
-        if (uiState.isSearchActive) {
-            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                SearchInputBar(
-                    query = uiState.searchQuery,
-                    onQueryChange = viewModel::onSearchQueryChanged
-                )
-            }
+        // Search Bar (Always visible)
+        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            SearchInputBar(
+                query = uiState.searchQuery,
+                onQueryChange = viewModel::onSearchQueryChanged,
+                placeholder = "Search ledger..."
+            )
         }
 
         // App Filters Row with breathing room
         if (uiState.appFilters.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(2.dp))
             Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
                 AppFilterChips(
                     filters = uiState.appFilters,
@@ -135,7 +145,7 @@ fun TimelineScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "LEDGER EMPTY",
+                    text = "NO DROPS TODAY",
                     style = MonoBody,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -22,8 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.humayanx.lastdrop.data.local.entity.NotificationRecord
 import io.github.humayanx.lastdrop.ui.theme.AppIcons
 import io.github.humayanx.lastdrop.ui.theme.MonoTimestamp
@@ -126,25 +128,107 @@ fun NotificationCard(
             if (!record.title.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = record.title,
-                    style = MaterialTheme.typography.bodyLarge,
+                    text = record.title.trim(),
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        lineHeight = 20.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
 
-            val contentDisplay = record.content ?: record.bigText
-            if (!contentDisplay.isNullOrEmpty()) {
+            val bodyPreview = formatNotificationBodyPreview(
+                content = record.content,
+                bigText = record.bigText,
+                title = record.title
+            )
+
+            if (bodyPreview.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = contentDisplay,
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = bodyPreview,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 13.5.sp,
+                        lineHeight = 19.sp,
+                        letterSpacing = 0.15.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 3,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
         }
+    }
+}
+
+/**
+ * Formats messy notification bodies into clean, flowing preview snippets.
+ * Strips redundant sender/title prefixes, collapses awkward multi-newlines,
+ * and eliminates duplicate content.
+ */
+internal fun formatNotificationBodyPreview(
+    content: String?,
+    bigText: String?,
+    title: String?
+): String {
+    val trimmedTitle = title?.trim() ?: ""
+
+    // Pick the most informative body that isn't identical to the title
+    val rawText = when {
+        !content.isNullOrBlank() && (trimmedTitle.isEmpty() || !content.trim().equals(trimmedTitle, ignoreCase = true)) -> content
+        !bigText.isNullOrBlank() && (trimmedTitle.isEmpty() || !bigText.trim().equals(trimmedTitle, ignoreCase = true)) -> bigText
+        !content.isNullOrBlank() -> content
+        !bigText.isNullOrBlank() -> bigText
+        else -> return ""
+    }.trim()
+
+    if (rawText.isEmpty()) return ""
+
+    var text = rawText
+
+    // If body text is identical to title, skip repeating it
+    if (trimmedTitle.isNotEmpty() && text.equals(trimmedTitle, ignoreCase = true)) {
+        return ""
+    }
+
+    // Strip redundant sender / title prefix
+    if (trimmedTitle.isNotEmpty()) {
+        val prefixes = listOf(
+            "$trimmedTitle:",
+            "$trimmedTitle -",
+            "$trimmedTitle ·",
+            "$trimmedTitle •",
+            "$trimmedTitle—"
+        )
+        for (prefix in prefixes) {
+            if (text.startsWith(prefix, ignoreCase = true)) {
+                text = text.substring(prefix.length).trimStart()
+                break
+            }
+        }
+    }
+
+    // Also strip sender prefix if title contains channel/sender separator "·"
+    if (trimmedTitle.contains("·")) {
+        val sender = trimmedTitle.substringAfterLast("·").trim()
+        if (sender.isNotEmpty() && text.startsWith("$sender:", ignoreCase = true)) {
+            text = text.substring(sender.length + 1).trimStart()
+        }
+    }
+
+    // Clean up lines and whitespace
+    val cleanLines = text.lines()
+        .map { it.trim().replace(Regex("\\s+"), " ") }
+        .filter { it.isNotEmpty() }
+
+    if (cleanLines.isEmpty()) return ""
+
+    val isChatLog = cleanLines.size > 1 && cleanLines.any { it.contains(":") }
+    return if (isChatLog) {
+        cleanLines.joinToString("  •  ")
+    } else {
+        cleanLines.joinToString(" ")
     }
 }

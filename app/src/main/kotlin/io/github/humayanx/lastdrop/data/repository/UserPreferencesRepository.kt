@@ -26,8 +26,8 @@ enum class RetentionPeriod(val days: Int, val label: String) {
 }
 
 data class UserPreferences(
-    val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val retentionPeriod: RetentionPeriod = RetentionPeriod.DAYS_30,
+    val themeMode: ThemeMode = ThemeMode.LIGHT,
+    val retentionPeriod: RetentionPeriod = RetentionPeriod.DAYS_7,
     val setupCompleted: Boolean = false
 )
 
@@ -42,11 +42,11 @@ class UserPreferencesRepository(private val context: Context) {
     val userPreferencesFlow: Flow<UserPreferences> = context.dataStore.data.catch { error ->
         if (error is IOException) emit(emptyPreferences()) else throw error
     }.map { preferences ->
-        val themeModeName = preferences[PreferencesKeys.THEME_MODE] ?: ThemeMode.SYSTEM.name
-        val retentionName = preferences[PreferencesKeys.RETENTION_PERIOD] ?: RetentionPeriod.DAYS_30.name
+        val themeModeName = preferences[PreferencesKeys.THEME_MODE] ?: ThemeMode.LIGHT.name
+        val retentionName = preferences[PreferencesKeys.RETENTION_PERIOD] ?: RetentionPeriod.DAYS_7.name
 
-        val themeMode = runCatching { ThemeMode.valueOf(themeModeName) }.getOrDefault(ThemeMode.SYSTEM)
-        val retention = runCatching { RetentionPeriod.valueOf(retentionName) }.getOrDefault(RetentionPeriod.DAYS_30)
+        val themeMode = runCatching { ThemeMode.valueOf(themeModeName) }.getOrDefault(ThemeMode.LIGHT)
+        val retention = runCatching { RetentionPeriod.valueOf(retentionName) }.getOrDefault(RetentionPeriod.DAYS_7)
 
         UserPreferences(
             themeMode = themeMode,

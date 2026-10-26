@@ -8,13 +8,19 @@ import io.github.humayanx.lastdrop.data.local.entity.NotificationRecord
 import io.github.humayanx.lastdrop.data.repository.NotificationRepository
 import io.github.humayanx.lastdrop.service.LastDropListenerService
 import io.github.humayanx.lastdrop.service.PermissionManager
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import io.github.humayanx.lastdrop.ui.screens.analytics.startOfDay
 import io.github.humayanx.lastdrop.ui.state.NotificationSelection
+import java.time.Instant
+import java.time.ZoneId
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,18 +51,31 @@ class TimelineViewModel(
         runCatching { PermissionManager.isBatteryOptimizationIgnored(LastDropApp.instance) }.getOrDefault(false)
     )
 
+    private val dayStartFlow = flow {
+        while (true) {
+            val now = Instant.now()
+            val zone = ZoneId.systemDefault()
+            emit(startOfDay(now, zone))
+            delay(30_000L)
+        }
+    }.distinctUntilChanged()
+
     private val notificationsFlow = combine(
         searchQuery,
-        selectedApp
-    ) { query, app ->
-        Pair(query, app)
-    }.flatMapLatest { (query, app) ->
-        when {
+        selectedApp,
+        dayStartFlow
+    ) { query, app, todayStart ->
+        Triple(query, app, todayStart)
+    }.flatMapLatest { (query, app, todayStart) ->
+        val source = when {
             query.isNotBlank() -> repository.searchNotifications(query).map { records ->
                 if (app == null) records else records.filter { it.appName == app }
             }
             app != null -> repository.getNotificationsByAppName(app)
             else -> repository.allNotifications
+        }
+        source.map { records ->
+            records.filter { it.timestamp >= todayStart }
         }
     }
 
@@ -77,9 +96,13 @@ class TimelineViewModel(
         FilterState(app, query, searchActive, record, hasPermission, batteryIgnored)
     }
 
-    private val appFiltersFlow = repository.allNotifications.map { allRecords ->
-        val total = allRecords.size
-        val countsByApp = allRecords.groupingBy { it.appName }.eachCount()
+    private val appFiltersFlow = combine(
+        repository.allNotifications,
+        dayStartFlow
+    ) { allRecords, todayStart ->
+        val todayRecords = allRecords.filter { it.timestamp >= todayStart }
+        val total = todayRecords.size
+        val countsByApp = todayRecords.groupingBy { it.appName }.eachCount()
         val filterList = countsByApp.entries
             .sortedBy { it.key.lowercase() }
             .map { AppFilterItem(it.key, it.value) }

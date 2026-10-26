@@ -62,7 +62,8 @@ class MainActivity : ComponentActivity() {
             val isDark = when (preferences?.themeMode) {
                 ThemeMode.DARK -> true
                 ThemeMode.LIGHT -> false
-                else -> systemInDark
+                ThemeMode.SYSTEM -> systemInDark
+                null -> false
             }
 
             LastDropTheme(darkTheme = isDark) {

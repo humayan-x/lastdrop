@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import io.github.humayanx.lastdrop.BuildConfig
 import io.github.humayanx.lastdrop.LastDropApp
+import io.github.humayanx.lastdrop.data.debug.DebugDataSeeder
 import androidx.compose.material3.Checkbox
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -83,8 +86,8 @@ fun SetupGate(
             if (!state.setupCompleted) {
                 TextButton(onClick = { browsingHistory = false }) { Text("Return to setup") }
             }
-            if (!state.isNotificationListenerGranted || !state.isServiceConnected ||
-                !state.isBatteryOptimizedIgnored) {
+            if (!BuildConfig.DEBUG && (!state.isNotificationListenerGranted || !state.isServiceConnected ||
+                !state.isBatteryOptimizedIgnored)) {
                 Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp)) {
                     Text(if (!state.isNotificationListenerGranted || !state.isServiceConnected)
                         "Capture is paused. Your saved history is still available."
@@ -101,7 +104,23 @@ fun SetupGate(
         }
     } else {
         Column(Modifier.fillMaxSize()) {
-            LastDropHeader(title = "Set up LastDrop")
+            LastDropHeader(
+                title = "Set up LastDrop",
+                actions = {
+                    if (BuildConfig.DEBUG) {
+                        TextButton(
+                            onClick = {
+                                scope.launch {
+                                    viewModel.skipSetup()
+                                    DebugDataSeeder.seedIfEmpty(LastDropApp.instance.database.notificationDao())
+                                }
+                            }
+                        ) {
+                            Text("SKIP", style = MonoBody)
+                        }
+                    }
+                }
+            )
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
@@ -175,6 +194,22 @@ fun SetupGate(
                             }
                         }
                     ) { Text("FINISH SETUP", style = MonoBody) }
+                }
+                if (BuildConfig.DEBUG) {
+                    item {
+                        OutlinedButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp),
+                            onClick = {
+                                scope.launch {
+                                    viewModel.skipSetup()
+                                    DebugDataSeeder.seedIfEmpty(LastDropApp.instance.database.notificationDao())
+                                }
+                            }
+                        ) {
+                            Text("SKIP SETUP (DEBUG)", style = MonoBody)
+                        }
+                    }
                 }
             }
         }

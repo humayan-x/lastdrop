@@ -95,7 +95,7 @@ fun SettingsLinksCard(
                 LinkTile(
                     icon = Icons.Outlined.Info,
                     title = "APP VERSION",
-                    value = "v1.0.0",
+                    value = "v${io.github.humayanx.lastdrop.BuildConfig.VERSION_NAME}",
                     onClick = {}
                 )
             }
