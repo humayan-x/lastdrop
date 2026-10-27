@@ -82,7 +82,7 @@ fun AppFilterChips(
         }
 
         filters.forEach { item ->
-            val isSelected = selectedApp == item.appName
+            val isSelected = selectedApp == item.key
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
@@ -96,7 +96,7 @@ fun AppFilterChips(
                         else MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .clickable { onAppSelected(item.appName) }
+                    .clickable { onAppSelected(item.key) }
                     .padding(horizontal = 12.dp, vertical = 6.dp),
                 contentAlignment = Alignment.Center
             ) {

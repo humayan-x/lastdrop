@@ -29,6 +29,7 @@ import io.github.humayanx.lastdrop.service.PermissionManager
 import io.github.humayanx.lastdrop.ui.components.LastDropHeader
 import io.github.humayanx.lastdrop.ui.screens.analytics.components.AppVolumeRow
 import io.github.humayanx.lastdrop.ui.screens.analytics.components.HourlyActivityCard
+import io.github.humayanx.lastdrop.ui.screens.analytics.components.SpammerPodium
 import io.github.humayanx.lastdrop.ui.screens.analytics.components.StatSummaryCard
 import io.github.humayanx.lastdrop.ui.theme.AppIcons
 import io.github.humayanx.lastdrop.ui.theme.MonoBody
@@ -83,17 +84,29 @@ fun AnalyticsScreen(
                         StatSummaryCard("Apps", "${uiState.appCounts.size}", Modifier.weight(1f))
                     }
                 }
+                if (uiState.topSpammerApps.isNotEmpty()) {
+                    item { Text("Top Notification Spammers", style = MonoHeader) }
+                    item {
+                        SpammerPodium(
+                            apps = uiState.topSpammerApps,
+                            onAppClick = { app ->
+                                PermissionManager.openAppNotificationSettings(context, app.packageName)
+                            }
+                        )
+                    }
+                }
+
                 item { Text("APPS TODAY", style = MonoHeader) }
-                if (uiState.appCounts.isEmpty()) {
+                if (uiState.otherAppsToday.isEmpty()) {
                     item {
                         Text(
-                            text = "No notifications yet",
+                            text = if (uiState.appCounts.isEmpty()) "No notifications yet" else "No other apps today",
                             style = MonoBody,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
-                items(uiState.appCounts, key = { it.packageName }) { app ->
+                items(uiState.otherAppsToday, key = { it.packageName }) { app ->
                     Surface(
                         shape = RoundedCornerShape(12.dp),
                         color = MaterialTheme.colorScheme.surface

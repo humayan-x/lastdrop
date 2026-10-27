@@ -1,6 +1,15 @@
 package io.github.humayanx.lastdrop.ui.screens.timeline
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import io.github.humayanx.lastdrop.ui.components.NativeAppIcon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -58,6 +66,8 @@ fun TimelineScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var recordPendingDelete by remember { mutableStateOf<NotificationRecord?>(null) }
+    val groups = remember(uiState.notifications, uiState.systemPackages) { groupNotificationsByApp(uiState.notifications, uiState.systemPackages) }
+    var expandedPackages by rememberSaveable { mutableStateOf(emptyList<String>()) }
     var showArchive by rememberSaveable { mutableStateOf(false) }
 
     if (showArchive) {
@@ -156,16 +166,59 @@ fun TimelineScreen(
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 112.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(
-                    items = uiState.notifications,
-                    key = { it.id }
-                ) { record ->
-                    NotificationCard(
-                        record = record,
-                        onClick = { viewModel.onSelectRecord(record) },
-                        onToggleStar = { viewModel.onToggleStar(record) },
-                        onDelete = { recordPendingDelete = record }
-                    )
+                if (uiState.selectedApp != null) {
+                    items(uiState.notifications, key = { "notification:${it.id}" }) { record ->
+                        NotificationCard(
+                            record = record,
+                            onClick = { viewModel.onSelectRecord(record) },
+                            onToggleStar = { viewModel.onToggleStar(record) },
+                            onDelete = { recordPendingDelete = record }
+                        )
+                    }
+                } else groups.forEach { group ->
+                    val expanded = group.packageName in expandedPackages
+                    item(key = "app:${group.packageName}") {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.surface
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                                    .semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" }
+                                    .clickable {
+                                        expandedPackages = if (expanded) expandedPackages - group.packageName
+                                        else expandedPackages + group.packageName
+                                    }
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                if (group.packageName == SYSTEM_GROUP_KEY) {
+                                    Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(28.dp))
+                                } else {
+                                    NativeAppIcon(group.packageName)
+                                }
+                                Text(group.appName, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
+                                Text("${group.notifications.size}", style = MonoBody)
+                                Icon(
+                                    imageVector = AppIcons.ChevronRight,
+                                    modifier = Modifier.rotate(if (expanded) -90f else 90f),
+                                    contentDescription = if (expanded) "Collapse notifications" else "Expand notifications"
+                                )
+                            }
+                        }
+                    }
+                    if (expanded) {
+                        items(group.notifications, key = { "notification:${it.id}" }) { record ->
+                            NotificationCard(
+                                record = record,
+                                onClick = { viewModel.onSelectRecord(record) },
+                                onToggleStar = { viewModel.onToggleStar(record) },
+                                onDelete = { recordPendingDelete = record },
+                                modifier = Modifier.padding(start = 12.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
