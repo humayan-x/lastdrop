@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.humayanx.lastdrop.data.local.entity.NotificationRecord
+import io.github.humayanx.lastdrop.ui.theme.AmberAccent
 import io.github.humayanx.lastdrop.ui.theme.AppIcons
 import io.github.humayanx.lastdrop.ui.theme.MonoBody
 import io.github.humayanx.lastdrop.ui.theme.MonoTimestamp
@@ -99,7 +100,7 @@ fun NotificationDetailSheet(
                         Icon(
                             imageVector = if (record.isStarred) AppIcons.Bookmark else AppIcons.BookmarkBorder,
                             contentDescription = if (record.isStarred) "Saved" else "Save",
-                            tint = if (record.isStarred) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = if (record.isStarred) AmberAccent else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }

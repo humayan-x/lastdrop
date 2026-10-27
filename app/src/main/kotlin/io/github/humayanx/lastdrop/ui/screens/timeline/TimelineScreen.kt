@@ -54,6 +54,12 @@ import io.github.humayanx.lastdrop.ui.components.NotificationDetailSheet
 import io.github.humayanx.lastdrop.ui.components.PermissionPromptDialog
 import io.github.humayanx.lastdrop.ui.components.SearchInputBar
 import io.github.humayanx.lastdrop.ui.screens.archive.ArchiveScreen
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
+import io.github.humayanx.lastdrop.ui.theme.SolidIndigo
+import io.github.humayanx.lastdrop.ui.theme.MonoTimestamp
 import io.github.humayanx.lastdrop.ui.theme.AppIcons
 import io.github.humayanx.lastdrop.ui.theme.MonoBody
 
@@ -180,7 +186,8 @@ fun TimelineScreen(
                     item(key = "app:${group.packageName}") {
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.surface
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth()
@@ -189,21 +196,33 @@ fun TimelineScreen(
                                         expandedPackages = if (expanded) expandedPackages - group.packageName
                                         else expandedPackages + group.packageName
                                     }
-                                    .padding(16.dp),
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 if (group.packageName == SYSTEM_GROUP_KEY) {
-                                    Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(28.dp))
+                                    Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(28.dp), tint = MaterialTheme.colorScheme.primary)
                                 } else {
                                     NativeAppIcon(group.packageName)
                                 }
-                                Text(group.appName, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
-                                Text("${group.notifications.size}", style = MonoBody)
+                                Text(group.appName, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(if (expanded) SolidIndigo else MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                ) {
+                                    Text(
+                                        "${group.notifications.size}",
+                                        style = MonoTimestamp,
+                                        color = if (expanded) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                                 Icon(
                                     imageVector = AppIcons.ChevronRight,
                                     modifier = Modifier.rotate(if (expanded) -90f else 90f),
-                                    contentDescription = if (expanded) "Collapse notifications" else "Expand notifications"
+                                    contentDescription = if (expanded) "Collapse notifications" else "Expand notifications",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }

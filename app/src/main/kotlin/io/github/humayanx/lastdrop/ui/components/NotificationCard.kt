@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.humayanx.lastdrop.data.local.entity.NotificationRecord
+import io.github.humayanx.lastdrop.ui.theme.AmberAccent
 import io.github.humayanx.lastdrop.ui.theme.AppIcons
 import io.github.humayanx.lastdrop.ui.theme.MonoTimestamp
 import java.text.SimpleDateFormat
@@ -55,7 +56,7 @@ fun NotificationCard(
             .background(MaterialTheme.colorScheme.surface)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
+                color = if (record.isStarred) AmberAccent.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(12.dp)
             )
             .clickable(onClick = onClick)
@@ -104,7 +105,7 @@ fun NotificationCard(
                         Icon(
                             imageVector = if (record.isStarred) AppIcons.Bookmark else AppIcons.BookmarkBorder,
                             contentDescription = if (record.isStarred) "Starred" else "Star",
-                            tint = if (record.isStarred) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = if (record.isStarred) AmberAccent else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
                     }

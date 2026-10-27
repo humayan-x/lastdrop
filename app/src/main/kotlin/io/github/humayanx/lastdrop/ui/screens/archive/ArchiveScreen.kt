@@ -44,6 +44,8 @@ import io.github.humayanx.lastdrop.ui.components.LoadingContent
 import io.github.humayanx.lastdrop.ui.components.NotificationCard
 import io.github.humayanx.lastdrop.ui.components.NotificationDetailSheet
 import io.github.humayanx.lastdrop.ui.components.SearchInputBar
+import androidx.compose.ui.graphics.Color
+import io.github.humayanx.lastdrop.ui.theme.SolidIndigo
 import io.github.humayanx.lastdrop.ui.theme.AppIcons
 import io.github.humayanx.lastdrop.ui.theme.MonoBody
 import io.github.humayanx.lastdrop.ui.theme.MonoHeader
@@ -298,7 +300,7 @@ private fun ArchiveDateCard(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(SolidIndigo)
                         .padding(horizontal = 10.dp, vertical = 8.dp)
                 ) {
                     Text(
@@ -306,7 +308,7 @@ private fun ArchiveDateCard(
                         style = MonoHeader.copy(
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = Color.White
                         )
                     )
                 }

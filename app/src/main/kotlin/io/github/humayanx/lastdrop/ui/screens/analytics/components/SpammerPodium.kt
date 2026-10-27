@@ -1,5 +1,6 @@
 package io.github.humayanx.lastdrop.ui.screens.analytics.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,8 +37,9 @@ fun SpammerPodium(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surface
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
@@ -50,10 +52,10 @@ fun SpammerPodium(
                 if (app == null) {
                     Spacer(Modifier.weight(1f))
                 } else {
-                    val medal = when (index) {
-                        0 -> Color(0xFFFFD54F)
-                        1 -> Color(0xFFBFC9D4)
-                        else -> Color(0xFFCD8B54)
+                    val deepMedalColor = when (index) {
+                        0 -> Color(0xFFB45309) // Deep Rich Gold
+                        1 -> Color(0xFF475569) // Deep Steel Silver
+                        else -> Color(0xFF9A3412) // Deep Solid Bronze
                     }
                     val rank = when (index) {
                         0 -> "1st"
@@ -62,7 +64,7 @@ fun SpammerPodium(
                     }
                     Column(
                         modifier = Modifier.weight(1f)
-                            .clip(RoundedCornerShape(4.dp))
+                            .clip(RoundedCornerShape(8.dp))
                             .clickable(
                                 role = Role.Button,
                                 onClickLabel = "Open notification settings",
@@ -74,37 +76,33 @@ fun SpammerPodium(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = app.count.toString(),
-                            modifier = Modifier.align(Alignment.End)
-                                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(4.dp))
+                            text = "${app.count} ALERTS",
+                            modifier = Modifier
+                                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(6.dp))
                                 .padding(horizontal = 8.dp, vertical = 4.dp),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Box(Modifier.size(56.dp), contentAlignment = Alignment.Center) {
+                        Spacer(Modifier.height(8.dp))
+                        Box(Modifier.size(52.dp), contentAlignment = Alignment.Center) {
                             NativeAppIcon(app.packageName, Modifier.size(40.dp))
                         }
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(10.dp))
                         Box(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .height(when (index) { 0 -> 100.dp; 1 -> 76.dp; else -> 56.dp })
-                                .background(medal.copy(alpha = 0.16f), RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
-                                .padding(top = 12.dp),
-                            contentAlignment = Alignment.TopCenter
+                                .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+                                .background(deepMedalColor),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Box(
-                                modifier = Modifier.background(medal, RoundedCornerShape(4.dp))
-                                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    rank,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF241C14)
-                                )
-                            }
+                            Text(
+                                text = rank,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White
+                            )
                         }
                     }
                 }

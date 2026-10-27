@@ -4,33 +4,69 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
+// 4 Core Solid Section Identities
+// 1. Solid Emerald (Live capture, Today stats, active tab)
+val SolidEmerald = Color(0xFF059669)
+val SolidEmeraldDark = Color(0xFF065F46)
+val SolidEmeraldGlow = Color(0xFF34D399)
+
+// 2. Solid Electric Indigo (Analytics activity, ledger apps, history)
+val SolidIndigo = Color(0xFF4F46E5)
+val SolidIndigoDark = Color(0xFF312E81)
+val SolidIndigoGlow = Color(0xFF818CF8)
+val IndigoCardLight = Color(0xFFEEF2FF)
+val IndigoCardDark = Color(0xFF1E1B4B)
+
+// 3. Solid Warm Amber (Starred vault, protected drops, gold podium)
+val SolidAmber = Color(0xFFD97706)
+val SolidAmberDark = Color(0xFF78350F)
+val SolidAmberGlow = Color(0xFFFBBF24)
+
+// 4. Solid Crimson Rose (Noise, notification spammers, database purge)
+val SolidCrimson = Color(0xFFE11D48)
+val SolidCrimsonDark = Color(0xFF881337)
+val SolidCrimsonGlow = Color(0xFFFB7185)
+
 // Primary Accents (Zero-Gradient Solids)
 val EmeraldAccent = Color(0xFF10B981)
 val EmeraldDark = Color(0xFF059669)
 val CyanAccent = Color(0xFF38BDF8)
 val CyanDark = Color(0xFF0284C7)
+val AmberAccent = Color(0xFFF59E0B)
+val AmberDark = Color(0xFFD97706)
 val CoralError = Color(0xFFF43F5E)
 val CoralErrorDark = Color(0xFFE11D48)
 
-// Dark Theme Surfaces (Terminal Obsidian / Slate)
-val DarkBackground = Color(0xFF0B0F14)
-val DarkSurface = Color(0xFF121820)
-val DarkSurfaceVariant = Color(0xFF1A222D)
-val DarkBorder = Color(0xFF232F3E)
-val DarkBorderSubtle = Color(0xFF18222C)
-val DarkTextPrimary = Color(0xFFF1F5F9)
+// Semantic Container Accents for Sections
+val AmberContainerLight = Color(0xFFFEF3C7)
+val AmberOnContainerLight = Color(0xFF92400E)
+val AmberContainerDark = Color(0xFF451A03)
+val AmberOnContainerDark = Color(0xFFFDE68A)
+
+val RoseContainerLight = Color(0xFFFFE4E6)
+val RoseOnContainerLight = Color(0xFF9F1239)
+val RoseContainerDark = Color(0xFF4C0519)
+val RoseOnContainerDark = Color(0xFFFECDD3)
+
+// Dark Theme Surfaces (Midnight Slate - Comfortable elevation, avoids pitch black void)
+val DarkBackground = Color(0xFF0F172A)
+val DarkSurface = Color(0xFF1E293B)
+val DarkSurfaceVariant = Color(0xFF334155)
+val DarkBorder = Color(0xFF475569)
+val DarkBorderSubtle = Color(0xFF334155)
+val DarkTextPrimary = Color(0xFFF8FAFC)
 val DarkTextSecondary = Color(0xFF94A3B8)
 val DarkTextMuted = Color(0xFF64748B)
 
-// Light Theme Surfaces (Clean Crisp Chalk / Alabaster)
-val LightBackground = Color(0xFFF8FAFC)
+// Light Theme Surfaces (Grounded Slate Canvas + Crisp Elevated Surfaces)
+val LightBackground = Color(0xFFF1F5F9)
 val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFF1F5F9)
-val LightBorder = Color(0xFFE2E8F0)
-val LightBorderSubtle = Color(0xFFCBD5E1)
+val LightSurfaceVariant = Color(0xFFE2E8F0)
+val LightBorder = Color(0xFFCBD5E1)
+val LightBorderSubtle = Color(0xFFE2E8F0)
 val LightTextPrimary = Color(0xFF0F172A)
 val LightTextSecondary = Color(0xFF475569)
-val LightTextMuted = Color(0xFF94A3B8)
+val LightTextMuted = Color(0xFF64748B)
 
 // Status Dot Indicators
 val StatusActive = Color(0xFF10B981)
@@ -57,7 +93,9 @@ val LastDropDarkColorScheme = darkColorScheme(
     outline = DarkBorder,
     outlineVariant = DarkBorderSubtle,
     error = CoralError,
-    onError = Color(0xFF4C0519)
+    onError = Color(0xFF4C0519),
+    errorContainer = RoseContainerDark,
+    onErrorContainer = RoseOnContainerDark
 )
 
 val LastDropLightColorScheme = lightColorScheme(
@@ -80,5 +118,7 @@ val LastDropLightColorScheme = lightColorScheme(
     outline = LightBorder,
     outlineVariant = LightBorderSubtle,
     error = CoralErrorDark,
-    onError = Color(0xFFFFFFFF)
+    onError = Color(0xFFFFFFFF),
+    errorContainer = RoseContainerLight,
+    onErrorContainer = RoseOnContainerLight
 )

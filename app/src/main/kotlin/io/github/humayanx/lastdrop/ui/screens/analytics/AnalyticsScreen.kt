@@ -31,7 +31,19 @@ import io.github.humayanx.lastdrop.ui.screens.analytics.components.AppVolumeRow
 import io.github.humayanx.lastdrop.ui.screens.analytics.components.HourlyActivityCard
 import io.github.humayanx.lastdrop.ui.screens.analytics.components.SpammerPodium
 import io.github.humayanx.lastdrop.ui.screens.analytics.components.StatSummaryCard
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import io.github.humayanx.lastdrop.ui.theme.AppIcons
+import io.github.humayanx.lastdrop.ui.theme.SolidCrimson
+import io.github.humayanx.lastdrop.ui.theme.SolidEmerald
+import io.github.humayanx.lastdrop.ui.theme.SolidEmeraldDark
+import io.github.humayanx.lastdrop.ui.theme.SolidEmeraldGlow
+import io.github.humayanx.lastdrop.ui.theme.SolidIndigo
+import io.github.humayanx.lastdrop.ui.theme.SolidIndigoDark
+import io.github.humayanx.lastdrop.ui.theme.SolidIndigoGlow
 import io.github.humayanx.lastdrop.ui.theme.MonoBody
 import io.github.humayanx.lastdrop.ui.theme.MonoHeader
 
@@ -47,7 +59,7 @@ fun AnalyticsScreen(
 
     Column(modifier = modifier.fillMaxSize()) {
         LastDropHeader(
-            title = "Today",
+            title = "LAST DROP",
             actions = {
                 IconButton(
                     onClick = { viewModel.toggleTheme(isDark) },
@@ -80,12 +92,41 @@ fun AnalyticsScreen(
                 }
                 item {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        StatSummaryCard("Today", "${uiState.todayCount}", Modifier.weight(1f))
-                        StatSummaryCard("Apps", "${uiState.appCounts.size}", Modifier.weight(1f))
+                        StatSummaryCard(
+                            title = "Today",
+                            value = "${uiState.todayCount}",
+                            containerColor = if (isDark) SolidEmeraldDark else SolidEmerald,
+                            contentColor = Color.White,
+                            valueColor = if (isDark) SolidEmeraldGlow else Color.White,
+                            borderColor = Color.Transparent,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatSummaryCard(
+                            title = "Apps",
+                            value = "${uiState.appCounts.size}",
+                            containerColor = if (isDark) SolidIndigoDark else SolidIndigo,
+                            contentColor = Color.White,
+                            valueColor = if (isDark) SolidIndigoGlow else Color.White,
+                            borderColor = Color.Transparent,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
                 if (uiState.topSpammerApps.isNotEmpty()) {
-                    item { Text("Top Notification Spammers", style = MonoHeader) }
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(SolidCrimson)
+                            )
+                            Text("NOTIFICATION SPAMMERS", style = MonoHeader, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
                     item {
                         SpammerPodium(
                             apps = uiState.topSpammerApps,
@@ -96,7 +137,7 @@ fun AnalyticsScreen(
                     }
                 }
 
-                item { Text("APPS TODAY", style = MonoHeader) }
+                item { Text("OTHER APPS", style = MonoHeader) }
                 if (uiState.otherAppsToday.isEmpty()) {
                     item {
                         Text(

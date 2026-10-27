@@ -19,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import io.github.humayanx.lastdrop.ui.theme.SolidIndigo
 import io.github.humayanx.lastdrop.data.repository.RetentionPeriod
 import io.github.humayanx.lastdrop.ui.theme.MonoHeader
 import io.github.humayanx.lastdrop.ui.theme.MonoTimestamp
@@ -64,12 +66,12 @@ fun RetentionSelector(
                             .weight(1f)
                             .clip(RoundedCornerShape(8.dp))
                             .background(
-                                if (isSelected) MaterialTheme.colorScheme.primaryContainer
+                                if (isSelected) SolidIndigo
                                 else MaterialTheme.colorScheme.surfaceVariant
                             )
                             .border(
                                 width = 1.dp,
-                                color = if (isSelected) MaterialTheme.colorScheme.primary
+                                color = if (isSelected) SolidIndigo
                                 else MaterialTheme.colorScheme.outline,
                                 shape = RoundedCornerShape(8.dp)
                             )
@@ -80,7 +82,7 @@ fun RetentionSelector(
                         Text(
                             text = period.label.uppercase(),
                             style = MonoTimestamp,
-                            color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                            color = if (isSelected) Color.White
                             else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
