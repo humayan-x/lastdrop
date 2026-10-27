@@ -112,29 +112,27 @@ fun AnalyticsScreen(
                         )
                     }
                 }
-                if (uiState.topSpammerApps.isNotEmpty()) {
-                    item {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(SolidCrimson)
-                            )
-                            Text("NOTIFICATION SPAMMERS", style = MonoHeader, color = MaterialTheme.colorScheme.onSurface)
-                        }
-                    }
-                    item {
-                        SpammerPodium(
-                            apps = uiState.topSpammerApps,
-                            onAppClick = { app ->
-                                PermissionManager.openAppNotificationSettings(context, app.packageName)
-                            }
+                item {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(SolidCrimson)
                         )
+                        Text("NOTIFICATION SPAMMERS", style = MonoHeader, color = MaterialTheme.colorScheme.onSurface)
                     }
+                }
+                item {
+                    SpammerPodium(
+                        apps = uiState.topSpammerApps,
+                        onAppClick = { app ->
+                            PermissionManager.openAppNotificationSettings(context, app.packageName)
+                        }
+                    )
                 }
 
                 item { Text("OTHER APPS", style = MonoHeader) }

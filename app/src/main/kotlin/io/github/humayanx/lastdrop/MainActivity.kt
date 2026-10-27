@@ -12,8 +12,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.material3.Surface
-import io.github.humayanx.lastdrop.BuildConfig
-import io.github.humayanx.lastdrop.data.debug.DebugDataSeeder
 import io.github.humayanx.lastdrop.service.LastDropListenerService
 import io.github.humayanx.lastdrop.ui.components.LoadingContent
 import kotlinx.coroutines.Dispatchers
@@ -54,13 +52,6 @@ class MainActivity : ComponentActivity() {
                         // Binding is asynchronous; never trap the user on a spinner.
                         withTimeoutOrNull(1_500L) {
                             LastDropListenerService.isServiceConnected.first { it }
-                        }
-                    }
-                    if (BuildConfig.DEBUG) {
-                        withContext(Dispatchers.IO) {
-                            runCatching {
-                                DebugDataSeeder.seedIfEmpty(LastDropApp.instance.database.notificationDao())
-                            }
                         }
                     }
                     startupReady = true
