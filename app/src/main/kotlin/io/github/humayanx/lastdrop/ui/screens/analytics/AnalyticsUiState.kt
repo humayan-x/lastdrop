@@ -13,4 +13,15 @@ data class AnalyticsUiState(
     val isPermissionGranted: Boolean = false,
     val isServiceConnected: Boolean = false,
     val isBatteryOptimizedIgnored: Boolean = false
-)
+) {
+    val topSpammerApps: List<AppNotificationCount>
+        get() = appCounts.sortedWith(
+            compareByDescending<AppNotificationCount> { it.count }.thenBy { it.packageName }
+        ).take(3)
+
+    val otherAppsToday: List<AppNotificationCount>
+        get() {
+            val topPackages = topSpammerApps.map { it.packageName }.toSet()
+            return appCounts.filterNot { it.packageName in topPackages }
+        }
+}

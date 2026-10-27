@@ -44,7 +44,7 @@ fun SearchInputBar(
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
+                color = if (query.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(10.dp)
             )
             .padding(horizontal = 12.dp, vertical = 10.dp)
@@ -55,7 +55,7 @@ fun SearchInputBar(
             Icon(
                 imageVector = Icons.Rounded.Search,
                 contentDescription = "Search",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = if (query.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(18.dp)
             )
 

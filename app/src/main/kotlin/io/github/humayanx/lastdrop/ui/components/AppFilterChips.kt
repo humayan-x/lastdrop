@@ -48,7 +48,7 @@ fun AppFilterChips(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .background(
-                    if (isAllSelected) MaterialTheme.colorScheme.primaryContainer
+                    if (isAllSelected) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.surfaceVariant
                 )
                 .border(
@@ -69,25 +69,25 @@ fun AppFilterChips(
                     text = "ALL",
                     style = MonoBody,
                     fontWeight = if (isAllSelected) FontWeight.Bold else FontWeight.Normal,
-                    color = if (isAllSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                    color = if (isAllSelected) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = "$totalCount",
                     style = MonoTimestamp,
-                    color = if (isAllSelected) MaterialTheme.colorScheme.primary
+                    color = if (isAllSelected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
                     else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
             }
         }
 
         filters.forEach { item ->
-            val isSelected = selectedApp == item.appName
+            val isSelected = selectedApp == item.key
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .background(
-                        if (isSelected) MaterialTheme.colorScheme.primaryContainer
+                        if (isSelected) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.surfaceVariant
                     )
                     .border(
@@ -96,7 +96,7 @@ fun AppFilterChips(
                         else MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .clickable { onAppSelected(item.appName) }
+                    .clickable { onAppSelected(item.key) }
                     .padding(horizontal = 12.dp, vertical = 6.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -108,13 +108,13 @@ fun AppFilterChips(
                         text = item.appName.uppercase(),
                         style = MonoBody,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = "${item.count}",
                         style = MonoTimestamp,
-                        color = if (isSelected) MaterialTheme.colorScheme.primary
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
                         else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }

@@ -7,6 +7,18 @@
     <!-- Retention work has no network constraints or network access. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
 
+    <!-- Identify apps with launcher icons when separating system services in History. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.INFO" />
+        </intent>
+    </queries>
+
     <application
         android:name=".LastDropApp"
         android:allowBackup="true"

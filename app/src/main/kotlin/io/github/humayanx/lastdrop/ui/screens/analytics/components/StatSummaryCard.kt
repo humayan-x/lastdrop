@@ -17,23 +17,29 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.ui.graphics.Color
+
 /**
  * Metric summary card displaying title and count in the same row.
- * Zero gradients, crisp hairline border, bold typography.
+ * Solid container colors, crisp border, bold typography.
  */
 @Composable
 fun StatSummaryCard(
     title: String,
     value: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    valueColor: Color = MaterialTheme.colorScheme.primary,
+    borderColor: Color = MaterialTheme.colorScheme.outline
 ) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .background(containerColor)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
+                color = borderColor,
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(horizontal = 14.dp, vertical = 12.dp)
@@ -47,13 +53,13 @@ fun StatSummaryCard(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = contentColor
             )
             Text(
                 text = value,
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = valueColor
             )
         }
     }

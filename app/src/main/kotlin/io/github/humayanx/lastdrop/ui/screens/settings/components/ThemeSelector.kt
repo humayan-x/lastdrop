@@ -70,7 +70,7 @@ fun ThemeSelector(
                         ThemeMode.LIGHT -> AppIcons.LightMode
                     }
                     val itemColor = if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
+                        MaterialTheme.colorScheme.onPrimary
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
                     }
@@ -80,7 +80,7 @@ fun ThemeSelector(
                             .weight(1f)
                             .clip(RoundedCornerShape(8.dp))
                             .background(
-                                if (isSelected) MaterialTheme.colorScheme.primaryContainer
+                                if (isSelected) MaterialTheme.colorScheme.primary
                                 else MaterialTheme.colorScheme.surfaceVariant
                             )
                             .border(

@@ -95,10 +95,10 @@ fun SettingsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surface)
+                        .background(MaterialTheme.colorScheme.errorContainer)
                         .border(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
+                            color = MaterialTheme.colorScheme.error.copy(alpha = 0.4f),
                             shape = RoundedCornerShape(12.dp)
                         )
                         .padding(16.dp)
@@ -107,7 +107,7 @@ fun SettingsScreen(
                         Text(
                             text = "DATABASE PURGE",
                             style = MonoHeader,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onErrorContainer
                         )
                         Spacer(modifier = Modifier.height(14.dp))
                         Button(

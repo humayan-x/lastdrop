@@ -24,13 +24,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import io.github.humayanx.lastdrop.ui.theme.IndigoCardDark
+import io.github.humayanx.lastdrop.ui.theme.IndigoCardLight
+import io.github.humayanx.lastdrop.ui.theme.SolidAmber
+import io.github.humayanx.lastdrop.ui.theme.SolidEmerald
+import io.github.humayanx.lastdrop.ui.theme.SolidIndigo
+import io.github.humayanx.lastdrop.ui.theme.SolidIndigoDark
 import io.github.humayanx.lastdrop.ui.theme.MonoHeader
 import io.github.humayanx.lastdrop.ui.theme.MonoTimestamp
 import java.util.Locale
 
 /**
  * 24-hour bar chart displaying notification activity per hour for today.
- * Native zero-dependency Compose Canvas/Box rendering with interactive hour inspection.
+ * Solid Indigo Card with vibrant activity bars.
  */
 @Composable
 fun HourlyActivityCard(
@@ -40,15 +48,18 @@ fun HourlyActivityCard(
     modifier: Modifier = Modifier
 ) {
     var selectedHour by remember { mutableStateOf<Int?>(null) }
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val cardBg = if (isDark) IndigoCardDark else IndigoCardLight
+    val cardBorder = if (isDark) SolidIndigoDark else Color(0xFFC7D2FE)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .background(cardBg)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
+                color = cardBorder,
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(16.dp)
@@ -62,23 +73,37 @@ fun HourlyActivityCard(
                 Text(
                     text = "HOURLY ACTIVITY",
                     style = MonoHeader,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = if (isDark) Color(0xFFE0E7FF) else SolidIndigoDark
                 )
 
                 val selected = selectedHour
                 if (selected != null) {
                     val count = hourlyDistribution.getOrElse(selected) { 0 }
-                    Text(
-                        text = String.format(Locale.getDefault(), "%02d:00 · %d ALERTS", selected, count),
-                        style = MonoTimestamp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(SolidEmerald)
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = String.format(Locale.getDefault(), "%02d:00 · %d ALERTS", selected, count),
+                            style = MonoTimestamp,
+                            color = Color.White
+                        )
+                    }
                 } else {
-                    Text(
-                        text = "24 HOURS",
-                        style = MonoTimestamp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(if (isDark) SolidIndigoDark else Color(0xFFDDD6FE))
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = "24 HOURS",
+                            style = MonoTimestamp,
+                            color = if (isDark) Color(0xFFE0E7FF) else SolidIndigoDark
+                        )
+                    }
                 }
             }
 
@@ -103,10 +128,10 @@ fun HourlyActivityCard(
                     }
 
                     val barColor = when {
-                        isSelected -> MaterialTheme.colorScheme.secondary
-                        count > 0 -> MaterialTheme.colorScheme.primary
-                        isCurrent -> MaterialTheme.colorScheme.outline
-                        else -> MaterialTheme.colorScheme.surfaceVariant
+                        isSelected -> SolidAmber
+                        count > 0 -> SolidIndigo
+                        isCurrent -> SolidEmerald
+                        else -> if (isDark) Color(0xFF2E2A72) else Color(0xFFDDD6FE)
                     }
 
                     Column(
@@ -137,11 +162,12 @@ fun HourlyActivityCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "00h", style = MonoTimestamp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = "06h", style = MonoTimestamp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = "12h", style = MonoTimestamp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = "18h", style = MonoTimestamp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = "23h", style = MonoTimestamp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                val labelColor = if (isDark) Color(0xFFA5B4FC) else Color(0xFF6366F1)
+                Text(text = "00h", style = MonoTimestamp, color = labelColor)
+                Text(text = "06h", style = MonoTimestamp, color = labelColor)
+                Text(text = "12h", style = MonoTimestamp, color = labelColor)
+                Text(text = "18h", style = MonoTimestamp, color = labelColor)
+                Text(text = "23h", style = MonoTimestamp, color = labelColor)
             }
         }
     }

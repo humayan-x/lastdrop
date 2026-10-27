@@ -1,6 +1,9 @@
 package io.github.humayanx.lastdrop.ui.screens.timeline
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.humayanx.lastdrop.LastDropApp
@@ -39,6 +42,22 @@ class TimelineViewModel(
     private val repository: NotificationRepository = LastDropApp.instance.notificationRepository
 ) : ViewModel() {
 
+    private val systemPackageCache = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
+
+    private suspend fun systemPackages(records: List<NotificationRecord>): Set<String> = withContext(Dispatchers.IO) {
+        val pm = LastDropApp.instance.packageManager
+        records.map { it.packageName }.distinct().filter { packageName ->
+            systemPackageCache.getOrPut(packageName) {
+                runCatching {
+                    val info = pm.getApplicationInfo(packageName, 0)
+                    val isSystem = info.flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+                    // System services without a launcher icon belong together; regular apps remain separate.
+                    isSystem && pm.getLaunchIntentForPackage(packageName) == null
+                }.getOrDefault(false)
+            }
+        }.toSet()
+    }
+
     private val searchQuery = MutableStateFlow("")
     private val selectedApp = MutableStateFlow<String?>(null)
     private val isSearchActive = MutableStateFlow(false)
@@ -67,15 +86,13 @@ class TimelineViewModel(
     ) { query, app, todayStart ->
         Triple(query, app, todayStart)
     }.flatMapLatest { (query, app, todayStart) ->
-        val source = when {
-            query.isNotBlank() -> repository.searchNotifications(query).map { records ->
-                if (app == null) records else records.filter { it.appName == app }
-            }
-            app != null -> repository.getNotificationsByAppName(app)
-            else -> repository.allNotifications
-        }
+        val source = if (query.isNotBlank()) repository.searchNotifications(query) else repository.allNotifications
         source.map { records ->
-            records.filter { it.timestamp >= todayStart }
+            val todayRecords = records.filter { it.timestamp >= todayStart }
+            val system = systemPackages(todayRecords)
+            todayRecords.filter {
+                app == null || if (app == SYSTEM_GROUP_KEY) it.packageName in system else it.packageName == app
+            }.sortedByDescending { it.timestamp }
         }
     }
 
@@ -102,11 +119,11 @@ class TimelineViewModel(
     ) { allRecords, todayStart ->
         val todayRecords = allRecords.filter { it.timestamp >= todayStart }
         val total = todayRecords.size
-        val countsByApp = todayRecords.groupingBy { it.appName }.eachCount()
-        val filterList = countsByApp.entries
-            .sortedBy { it.key.lowercase() }
-            .map { AppFilterItem(it.key, it.value) }
-        Pair(total, filterList)
+        val system = systemPackages(todayRecords)
+        val filterList = groupNotificationsByApp(todayRecords, system)
+            .map { AppFilterItem(it.appName, it.notifications.size, it.packageName) }
+            .sortedBy { it.appName.lowercase() }
+        Triple(total, filterList, system)
     }
 
     val uiState: StateFlow<TimelineUiState> = combine(
@@ -114,11 +131,12 @@ class TimelineViewModel(
         appFiltersFlow,
         filterStateFlow,
         LastDropListenerService.isServiceConnected
-    ) { notifications, (total, filters), filter, isConnected ->
+    ) { notifications, (total, filters, system), filter, isConnected ->
         TimelineUiState(
             notifications = notifications,
             appFilters = filters,
             totalCount = total,
+            systemPackages = system,
             selectedApp = filter.app,
             searchQuery = filter.query,
             isSearchActive = filter.isSearchActive,

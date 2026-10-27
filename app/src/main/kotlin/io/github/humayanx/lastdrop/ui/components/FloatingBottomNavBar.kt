@@ -24,12 +24,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import io.github.humayanx.lastdrop.ui.theme.AppIcons
+import io.github.humayanx.lastdrop.ui.theme.SolidAmber
+import io.github.humayanx.lastdrop.ui.theme.SolidEmerald
+import io.github.humayanx.lastdrop.ui.theme.SolidIndigo
 
 enum class BottomTab(
     val title: String,
@@ -79,7 +83,7 @@ fun FloatingBottomNavBar(
             modifier = Modifier
                 .shadow(elevation = 8.dp, shape = shape)
                 .clip(shape)
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.background)
                 .border(1.dp, MaterialTheme.colorScheme.outline, shape)
                 .padding(horizontal = 10.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -87,13 +91,20 @@ fun FloatingBottomNavBar(
         ) {
             BottomTab.entries.forEach { tab ->
                 val isSelected = selectedTab == tab
+                val activeTabColor = when (tab) {
+                    BottomTab.ANALYTICS -> SolidEmerald
+                    BottomTab.TIMELINE -> SolidIndigo
+                    BottomTab.STARRED -> SolidAmber
+                    BottomTab.SETTINGS -> SolidEmerald
+                }
+
                 Box(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .background(
-                            if (isSelected) MaterialTheme.colorScheme.surfaceVariant
-                            else MaterialTheme.colorScheme.surface
+                            if (isSelected) activeTabColor
+                            else Color.Transparent
                         )
                         .clickable(role = Role.Tab) { onTabSelected(tab) }
                         .semantics { selected = isSelected },
@@ -102,7 +113,7 @@ fun FloatingBottomNavBar(
                     Icon(
                         imageVector = if (isSelected) tab.selectedIcon else tab.unselectedIcon,
                         contentDescription = tab.title,
-                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(24.dp)
                     )
                 }
