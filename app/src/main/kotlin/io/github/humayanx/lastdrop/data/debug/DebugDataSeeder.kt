@@ -257,9 +257,9 @@ object DebugDataSeeder {
             NotificationRecord(
                 packageName = "com.github.android",
                 appName = "GitHub",
-                title = "Release v1.1.0 published",
-                content = "lastdrop v1.1.0 is now live on GitHub Releases",
-                bigText = "Release v1.1.0 includes major performance improvements and Material 3 design enhancements.",
+                title = "Release v1.2.0 published",
+                content = "lastdrop v1.2.0 is now live on GitHub Releases",
+                bigText = "Release v1.2.0 includes major performance improvements, solid color redesign, and Material 3 enhancements.",
                 subText = "humayanx/lastdrop",
                 timestamp = todayStart - TimeUnit.HOURS.toMillis(7),
                 isRead = true,
