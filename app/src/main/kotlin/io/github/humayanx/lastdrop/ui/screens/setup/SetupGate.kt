@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import io.github.humayanx.lastdrop.BuildConfig
 import io.github.humayanx.lastdrop.LastDropApp
-import io.github.humayanx.lastdrop.data.debug.DebugDataSeeder
 import androidx.compose.material3.Checkbox
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -112,7 +111,6 @@ fun SetupGate(
                             onClick = {
                                 scope.launch {
                                     viewModel.skipSetup()
-                                    DebugDataSeeder.seedIfEmpty(LastDropApp.instance.database.notificationDao())
                                 }
                             }
                         ) {
@@ -203,7 +201,6 @@ fun SetupGate(
                             onClick = {
                                 scope.launch {
                                     viewModel.skipSetup()
-                                    DebugDataSeeder.seedIfEmpty(LastDropApp.instance.database.notificationDao())
                                 }
                             }
                         ) {

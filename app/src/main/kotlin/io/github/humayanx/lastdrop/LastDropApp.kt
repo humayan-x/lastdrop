@@ -36,9 +36,6 @@ class LastDropApp : Application() {
         // Catch up immediately whenever Android starts the app or its listener.
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
-                if (BuildConfig.DEBUG) {
-                    io.github.humayanx.lastdrop.data.debug.DebugDataSeeder.seedIfEmpty(database.notificationDao())
-                }
                 val preferences = userPreferencesRepository.userPreferencesFlow.first()
                 notificationRepository.purgeAuthenticationCodes()
                 notificationRepository.purgeOlderThan(preferences.retentionPeriod.days)

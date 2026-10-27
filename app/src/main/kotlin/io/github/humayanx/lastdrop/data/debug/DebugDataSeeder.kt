@@ -2,28 +2,11 @@ package io.github.humayanx.lastdrop.data.debug
 
 import io.github.humayanx.lastdrop.data.local.NotificationDao
 import io.github.humayanx.lastdrop.data.local.entity.NotificationRecord
-import kotlinx.coroutines.flow.first
 import java.time.Instant
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 object DebugDataSeeder {
-
-    suspend fun seedIfEmpty(dao: NotificationDao) {
-        val now = System.currentTimeMillis()
-        val zone = ZoneId.systemDefault()
-        val todayStart = Instant.ofEpochMilli(now).atZone(zone).toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli()
-
-        val totalCount = dao.getTotalCount().first()
-        if (totalCount == 0) {
-            seed(dao)
-        } else {
-            val todayCount = dao.getTodayCount(todayStart).first()
-            if (todayCount == 0) {
-                seedTodayOnly(dao, now, todayStart)
-            }
-        }
-    }
 
     suspend fun seed(dao: NotificationDao) {
         val now = System.currentTimeMillis()
@@ -31,10 +14,6 @@ object DebugDataSeeder {
         val todayStart = Instant.ofEpochMilli(now).atZone(zone).toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli()
         val allRecords = getTodayRecords(now, todayStart) + getPastRecords(todayStart)
         dao.insertAll(allRecords)
-    }
-
-    suspend fun seedTodayOnly(dao: NotificationDao, now: Long = System.currentTimeMillis(), todayStart: Long) {
-        dao.insertAll(getTodayRecords(now, todayStart))
     }
 
     private fun calculateTodayTimestamps(now: Long, todayStart: Long): List<Long> {
